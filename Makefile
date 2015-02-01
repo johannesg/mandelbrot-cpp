@@ -1,35 +1,42 @@
+# Simple makefile by Johannes Gustafsson
+#
+# inspired by http://aegis.sourceforge.net/auug97.pdf 
+#
+# 1. scans all *.cpp in src folder
+# 2. generates dependency file for every source file, stored in obj folder
+# 3. all object files are stored in obj folder
+# 4. output binary are stored in bin folder
+
 BINARY := prog
 
-CXX := g++
-CXXFLAGS := -std=c++11
-#CXX := clang++
+#CXX := g++
+CXX := clang++
+CXXFLAGS := -std=c++11 -Wall
 LDFLAGS := 
 
 RM := rm -f
 RMDIR := rm -rf
+MKDIR := mkdir -p
 
+BINDIR := bin
 SRCDIR := src
 OBJDIR := obj
 
+BIN := $(BINDIR)/$(BINARY)
 SRC := $(shell find $(SRCDIR) -name '*.cpp')
 OBJ := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 
-# include the description for each module
-#include $(patsubst %,%/module.mk,$(MODULES))
+.PHONY: default clean 
 
-.PHONY: all clean setup
-
-all: setup $(BINARY)
-
-setup:
-	mkdir -p $(OBJDIR)
+default: $(BIN)
 
 clean:
-	$(RM) prog
+	$(RMDIR) $(BINDIR)
 	$(RMDIR) $(OBJDIR)
 
 # link the program
-$(BINARY): $(OBJ)
+$(BIN): $(OBJ)
+	$(MKDIR) $(@D)
 	$(CXX) -o $@ $(OBJ) $(LDFLAGS)
 
 #compile
@@ -41,5 +48,5 @@ include $(OBJ:.o=.d)
 
 # calculate include dependencies
 $(OBJDIR)/%.d: $(SRCDIR)/%.cpp
-	mkdir -p `dirname $@` 
-	sh depend.sh `dirname $@` $(CXXFLAGS) $< > $@
+	$(MKDIR) $(@D) 
+	$(CXX) -MM -MG $< $(CXXFLAGS) | sed -e "s@^\(.*\)\.o:@$(@D)/\1.d $(@D)/\1.o:@" > $@
