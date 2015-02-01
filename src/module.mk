@@ -1,0 +1,1 @@
+SRC += src/main.cpp
