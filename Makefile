@@ -1,18 +1,11 @@
-CC := gcc
-CXX := g++
-#CXX := clang++
-RM := rm -f
-
-#MODULES := src src/bee
-
-# look for include files in
-# each of the modules
-#CFLAGS += $(patsubst %,-I%,$(MODULES))
-#CPPFLAGS += $(patsubst %,-I%,$(MODULES))
-
 BINARY := prog
 
-#CXXFLAGS += -std=c++11
+CC := gcc
+CXX := g++
+CXXFLAGS += -std=c++11
+#CXX := clang++
+RM := rm -f
+RMDIR := rm -rf
 
 # extra libraries if required
 LDFLAGS += 
@@ -36,15 +29,12 @@ include $(patsubst %,%/module.mk,$(MODULES))
 
 DEFS := $(OBJ:.o=.d)
 
-.PHONY: all clean src setup
+.PHONY: all clean setup
 
 all: setup $(BINARY)
 
 setup:
 	mkdir -p $(OBJDIR)
-src:
-	echo "OBJ = $(OBJ)"
-	echo "SRC = $(SRC)"
 
 # link the program
 $(BINARY): $(OBJ)
@@ -61,7 +51,8 @@ include $(OBJ:.o=.d)
 
 # calculate C include dependencies
 $(OBJDIR)/%.d: $(SRCDIR)/%.c
-	sh depend.sh `dirname $@` `dirname $*.c` $(CFLAGS) $*.c > $@
+	mkdir -p `dirname $@` 
+	sh depend.sh `dirname $@` `dirname $<` $@ $(CFLAGS) $< > $@
 
 #%.d: %.cpp
 $(OBJDIR)/%.d: $(SRCDIR)/%.cpp
@@ -69,11 +60,9 @@ $(OBJDIR)/%.d: $(SRCDIR)/%.cpp
 	sh depend.sh `dirname $@` `dirname $<` $@ $(CFLAGS) $< > $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	echo "COMPILE: $@ -> $<" 
 	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 clean:
 	$(RM) prog
-	$(RM) $(OBJ)
-	$(RM) $(DEFS)
+	$(RMDIR) $(OBJDIR)
 
