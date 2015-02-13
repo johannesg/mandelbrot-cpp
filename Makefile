@@ -11,8 +11,8 @@ BINARY := prog
 
 #CXX := g++
 CXX := clang++
-CXXFLAGS := -std=c++11 -Wall
-LDFLAGS := 
+CXXFLAGS := -std=c++11 -Wall -Wno-format-security
+LDFLAGS := -lzmq -lczmq
 
 RM := rm -f
 RMDIR := rm -rf
@@ -49,4 +49,4 @@ include $(OBJ:.o=.d)
 # calculate include dependencies
 $(OBJDIR)/%.d: $(SRCDIR)/%.cpp
 	$(MKDIR) $(@D) 
-	$(CXX) -MM -MG $< $(CXXFLAGS) | sed -e "s@^\(.*\)\.o:@$(@D)/\1.d $(@D)/\1.o:@" > $@
+	$(CXX) -MM  $< $(CXXFLAGS) | sed -e "s@^\(.*\)\.o:@$(@D)/\1.d $(@D)/\1.o:@" > $@
