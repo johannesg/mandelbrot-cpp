@@ -2,47 +2,65 @@
 #include "globals.h"
 #include "czmqpp/czmqpp.h"
 #include <iostream>
+#include <sstream>
+
 using namespace std;
 
-int s_worker_pipe(zloop_t* loop, zsock_t* reader, void* arg) {
-
-	cout << "worker pipe cmd" << endl;
-	auto msg = zstr_recv(reader);
-	if (msg == nullptr) return -1;
-
-	if (streq(msg, "$TERM")) return -1;
-
-	zstr_free(&msg);
-
-	return 0;
+worker::worker(int id) : id(id), _actor(zactor_new(actor_callback, this)) {}
+worker::~worker() { /*zactor_destroy(&_actor);*/
 }
 
-int s_worker(zloop_t* loop, zsock_t* reader, void* arg) {
+int worker::pipe_handler(zloop_t* loop, zsock_t* reader, void* arg) {
+    worker* self = reinterpret_cast<worker*>(arg);
+    cout << "worker " << self->id << ": pipe cmd" << endl;
+    auto msg = zstr_recv(reader);
 
-	auto msg = zstr_recv(reader);
-	cout << "worker cmd: " << msg << endl;
-	zstr_free(&msg);
+    int ret = 0;
+    if (msg == nullptr || streq(msg, "$TERM")) ret = -1;
 
-	return 0;
+    zstr_free(&msg);
+
+    return ret;
 }
 
-void worker(zsock_t* pipe, void* args) {
-	cout << "Starting worker" << endl;
+int worker::socket_handler(zloop_t* loop, zsock_t* reader, void* arg) {
+    worker* self = reinterpret_cast<worker*>(arg);
 
-	zsock_ptr worker(zsock_new_pull(nullptr));
+    auto msg = zstr_recv(reader);
+    cout << "worker " << self->id << ": cmd" << endl;
+    zstr_free(&msg);
 
-	auto ret = zsock_connect(worker.get(), endpoint);
-	
-	cout << "connect: " << ret << endl;
+    std::stringstream output;
 
-	auto loop = zloop_new();
+    output << "WORK from " << self->id;
 
-	zloop_reader(loop, pipe, s_worker_pipe, nullptr);
-	//	zloop_reader_set_tolerant(loop, pipe);
-	zloop_reader(loop, worker.get(), s_worker, nullptr);
+    zstr_send(self->_socket_result, output.str().c_str());
 
-	zloop_set_verbose(loop, true);
+    return 0;
+}
 
-	zsock_signal(pipe, 0);
-	zloop_start(loop);
+void worker::actor_callback(zsock_t* pipe, void* args) {
+    worker* self = reinterpret_cast<worker*>(args);
+    cout << "Starting worker" << endl;
+
+    zsock_ptr worker(zsock_new_pull(nullptr));
+    zsock_ptr worker_result(zsock_new_push(nullptr));
+
+    self->_socket_result = worker_result.get();
+
+    auto ret = zsock_connect(worker.get(), endpoint);
+    cout << "connect: " << ret << endl;
+    ret = zsock_connect(worker_result.get(), endpoint_worker);
+    cout << "connect: " << ret << endl;
+
+    auto loop = zloop_new();
+
+    zloop_reader(loop, pipe, pipe_handler, self);
+    //	zloop_reader_set_tolerant(loop, pipe);
+    zloop_reader(loop, worker.get(), socket_handler, self);
+
+    //zloop_set_verbose(loop, true);
+
+    zsock_signal(pipe, 0);
+    zloop_start(loop);
 }

@@ -20,5 +20,6 @@ class controller : boost::noncopyable {
     static void actor_callback(zsock_t* pipe, void* args);
 
     static int pipe_handler(zloop_t* loop, zsock_t* reader, void* arg);
+    static int result_handler(zloop_t* loop, zsock_t* reader, void* arg);
     static int timer_handler(zloop_t* loop, int timerId, void* arg); 
 };
