@@ -3,6 +3,7 @@
 #include "globals.h"
 #include "czmqpp/czmqpp.h"
 #include <iostream>
+#include "viewport.h"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ int controller::pipe_handler(zloop_t* loop, zsock_t* reader, void* arg) {
 }
 
 int controller::result_handler(zloop_t* loop, zsock_t* reader, void* arg) {
-    cout << "controller result: ";
+    cout << "controller result: ";:w
     auto msg = zstr_recv(reader);
     int ret = 0;
     if (msg == nullptr)
@@ -40,6 +41,13 @@ int controller::result_handler(zloop_t* loop, zsock_t* reader, void* arg) {
 }
 
 int controller::timer_handler(zloop_t* loop, int timerId, void* arg) {
+    auto topLeft = Point(-2, 1);
+    auto bottomRight = Point(1, -1);
+
+
+    Viewport v(topLeft, bottomRight, 640, 480); 
+
+
     cout << "controller: sending" << endl;
     zstr_send(arg, "HEJ");
 
