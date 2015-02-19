@@ -10,7 +10,15 @@
 
 using namespace std;
 
-int main() {
+void run_tests();
+
+int main(int argc, const char * argv[]) {
+
+    if (argc > 1 && streq("test", argv[1])) {
+        run_tests();
+        return 0;
+    }
+        
     controller c;
     worker w(1);
     worker w2(2);
@@ -25,4 +33,9 @@ int main() {
                 (void*)w4.actor(),
                 c.actor(), nullptr));
     zpoller_wait(poller.get(), -1);
+}
+
+void run_tests() {
+
+        cout << "Testing" << endl;
 }

@@ -25,7 +25,7 @@ int controller::pipe_handler(zloop_t* loop, zsock_t* reader, void* arg) {
 }
 
 int controller::result_handler(zloop_t* loop, zsock_t* reader, void* arg) {
-    cout << "controller result: ";:w
+    cout << "controller result: ";
     auto msg = zstr_recv(reader);
     int ret = 0;
     if (msg == nullptr)

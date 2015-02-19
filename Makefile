@@ -11,7 +11,7 @@ BINARY := prog
 
 #CXX := g++
 CXX := clang++
-CXXFLAGS := -std=c++11 -Wall -Wno-format-security
+CXXFLAGS := -std=c++11 -Wall -Wno-format-security -g -m64
 LDFLAGS := -lzmq -lczmq
 
 RM := rm -f
