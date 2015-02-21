@@ -25,16 +25,12 @@ int worker::pipe_handler(zloop_t* loop, zsock_t* reader, void* arg) {
 
 int worker::socket_handler(zloop_t* loop, zsock_t* reader, void* arg) {
     worker* self = reinterpret_cast<worker*>(arg);
+    int x;
+    int y;
+    zsock_recv(reader, "ii", &x, &y);
+//    cout << "worker " << self->id << ": x = " << x << ", y = " << y << endl;
 
-    auto msg = zstr_recv(reader);
-    cout << "worker " << self->id << ": cmd" << endl;
-    zstr_free(&msg);
-
-    std::stringstream output;
-
-    output << "WORK from " << self->id;
-
-    zstr_send(self->_socket_result, output.str().c_str());
+    zsock_send(self->_socket_result, "iii", x, y, 0);
 
     return 0;
 }
@@ -48,9 +44,9 @@ void worker::actor_callback(zsock_t* pipe, void* args) {
 
     self->_socket_result = worker_result.get();
 
-    auto ret = zsock_connect(worker.get(), endpoint);
+    auto ret = zsock_connect(worker.get(), endpoint_items);
     cout << "connect: " << ret << endl;
-    ret = zsock_connect(worker_result.get(), endpoint_worker);
+    ret = zsock_connect(worker_result.get(), endpoint_result);
     cout << "connect: " << ret << endl;
 
     auto loop = zloop_new();
@@ -59,7 +55,7 @@ void worker::actor_callback(zsock_t* pipe, void* args) {
     //	zloop_reader_set_tolerant(loop, pipe);
     zloop_reader(loop, worker.get(), socket_handler, self);
 
-    //zloop_set_verbose(loop, true);
+    // zloop_set_verbose(loop, true);
 
     zsock_signal(pipe, 0);
     zloop_start(loop);

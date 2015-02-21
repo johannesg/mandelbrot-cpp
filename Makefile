@@ -9,10 +9,16 @@
 
 BINARY := prog
 
+SDL_LIB := -lSDL2
+SDL_INCLUDE := 
+
+ZMQ_LIB := -lzmq -lczmq
+ZMQ_INCLUDE := 
+
 #CXX := g++
 CXX := clang++
 CXXFLAGS := -std=c++11 -Wall -Wno-format-security -g -m64
-LDFLAGS := -lzmq -lczmq
+LDFLAGS := $(ZMQ_LIB) $(SDL_LIB)
 
 RM := rm -f
 RMDIR := rm -rf
