@@ -3,6 +3,7 @@
 #include <czmq.h>
 #include <boost/core/noncopyable.hpp>
 #include "czmqpp/czmqpp.h"
+#include "viewport.h"
 
 class worker : boost::noncopyable {
    public:
@@ -15,6 +16,7 @@ class worker : boost::noncopyable {
 
    private:
     int id;
+    Mandlebrot m;
     zactor_ptr _actor;
     zsock_t* _socket_result;
 

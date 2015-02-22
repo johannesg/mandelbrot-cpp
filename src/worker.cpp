@@ -6,7 +6,10 @@
 
 using namespace std;
 
-worker::worker(int id) : id(id), _actor(zactor_new(actor_callback, this)) {}
+worker::worker(int id)
+    : id(id),
+      m(Point(-2, 1), Point(1, -1), SCREEN_WIDTH, SCREEN_HEIGHT),
+      _actor(zactor_new(actor_callback, this)) {}
 worker::~worker() { /*zactor_destroy(&_actor);*/
 }
 
@@ -28,9 +31,13 @@ int worker::socket_handler(zloop_t* loop, zsock_t* reader, void* arg) {
     int x;
     int y;
     zsock_recv(reader, "ii", &x, &y);
-//    cout << "worker " << self->id << ": x = " << x << ", y = " << y << endl;
 
-    zsock_send(self->_socket_result, "iii", x, y, 0);
+    auto coord = self->m.getCoord(x, y);
+    auto n = self->m.calcDot(coord);
+    //    cout << "worker " << self->id << ": x = " << x << ", y = " << y <<
+    //    endl;
+
+    zsock_send(self->_socket_result, "iii", x, y, n);
 
     return 0;
 }

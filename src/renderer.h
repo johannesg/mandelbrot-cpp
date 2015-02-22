@@ -2,6 +2,7 @@
 
 #include <czmq.h>
 #include <boost/core/noncopyable.hpp>
+#include <SDL2/SDL.h>
 
 class renderer : boost::noncopyable {
    public:
@@ -14,6 +15,11 @@ class renderer : boost::noncopyable {
 
    private:
     zactor_t* _actor;
+
+    SDL_Window * win;
+    SDL_Renderer * ren;
+    SDL_Surface * screen;
+    SDL_Texture * texture;
 
     static void actor_callback(zsock_t* pipe, void* args);
     static int pipe_handler(zloop_t* loop, zsock_t* reader, void* arg);

@@ -2,12 +2,13 @@
 #include <complex>
 typedef std::complex<double> Point;
 
-class Viewport {
+class Mandlebrot {
    public:
-    Viewport(Point topLeft, Point bottomRight, int bufferWidth,
+    Mandlebrot(Point topLeft, Point bottomRight, int bufferWidth,
              int bufferHeight);
 
     Point getCoord(int x, int y);
+    int calcDot(Point c); 
 
    private:
     Point topLeft;
