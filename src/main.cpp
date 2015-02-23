@@ -11,32 +11,19 @@
 
 #include <SDL2/SDL.h>
 #include "sdlex.h"
+#include "czmqpp/actor.h"
 
 using namespace std;
 using namespace sdl;
 
-void run_tests();
-int run_in_window();
-
 int main(int argc, const char* argv[]) {
-    if (argc > 1 && streq("test", argv[1])) {
-        run_tests();
-        return 0;
-    }
-
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
         return 1;
     }
 
-    return run_in_window();
+    czmq::actor<renderer2> r2; 
 
-    SDL_Quit();
-}
-
-void run_tests() { cout << "Testing" << endl; }
-
-int run_in_window() {
     controller c;
     renderer r;
     worker w(1);
@@ -52,6 +39,8 @@ int run_in_window() {
                                    c.actor(), r.actor(), nullptr));
 
     zpoller_wait(poller.get(), -1);
+    
+    SDL_Quit();
 
     return 0;
 }
