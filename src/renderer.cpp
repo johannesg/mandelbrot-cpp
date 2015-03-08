@@ -132,3 +132,7 @@ void renderer::actor_callback(zsock_t* pipe, void* args) {
     zsock_destroy(&socket);
     return;
 }
+
+
+
+

@@ -8,6 +8,7 @@
 #include "worker.h"
 #include "controller.h"
 #include "renderer.h"
+#include "renderer2.h"
 
 #include <SDL2/SDL.h>
 #include "sdlex.h"

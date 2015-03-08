@@ -3,7 +3,7 @@
 #include <czmq.h>
 #include <boost/core/noncopyable.hpp>
 #include <SDL2/SDL.h>
-
+#include "sdlex.h"
 
 class renderer : boost::noncopyable {
    public:
@@ -29,7 +29,3 @@ class renderer : boost::noncopyable {
     static int sdl_event_handler(zloop_t* loop, int timerId, void* arg);
 };
 
-class renderer2 : boost::noncopyable {
-    public:
-    renderer2(zsock_t * pipe) {}
-};
